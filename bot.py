@@ -1,4 +1,24 @@
-phone_book = {}
+from collections import UserDict
+
+
+class AddressBook(UserDict):
+    pass
+
+
+class Record:
+    pass
+
+
+class Field:
+    pass
+
+
+class Name(Field):
+    pass
+
+
+class Phone(Field):
+    pass
 
 
 def input_error(func):
@@ -56,7 +76,7 @@ def change_phone(*args):
 
 def show_all(*args):
     lst = ["{:^10}: {:>10}".format(k, v) for k, v in phone_book.items()]
-    return "{:^10}: {:^10}".format("Name", "Phone")+"\n"+"\n".join(lst)
+    return "{:^10}: {:^10}".format("Name", "Phone") + "\n" + "\n".join(lst)
 
 
 COMMANDS = {quit: ["good bye", "close", "exit"],
