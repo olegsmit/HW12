@@ -5,20 +5,24 @@ class AddressBook(UserDict):
     pass
 
 
-class Record:
-    pass
-
-
 class Field:
     pass
 
 
 class Name(Field):
-    pass
+    def __init__(self, name: str) -> None:
+        self.name = name
 
 
 class Phone(Field):
-    pass
+    def __init__(self, phone: list) -> None:
+        self.phone = phone
+
+
+class Record:
+    def __init__(self, name: Name, phone: Phone) -> None:
+        self.name = name
+        self.phone = phone
 
 
 def input_error(func):
