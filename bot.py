@@ -1,10 +1,6 @@
 from collections import UserDict
 
 
-class AddressBook(UserDict):
-    pass
-
-
 class Field:
     pass
 
@@ -23,6 +19,11 @@ class Record:
     def __init__(self, name: Name, phone: Phone) -> None:
         self.name = name
         self.phone = phone
+
+
+class AddressBook(UserDict):
+    def __init__(self, name: Name, phone: Phone):
+        self.items[name] = phone
 
 
 def input_error(func):
@@ -49,10 +50,10 @@ def hello(*args):
 
 @input_error
 def add(*args):
-    name = args[0]
-    phone = args[1]
-    if name not in phone_book:
-        phone_book[name] = phone
+    name = Name(args[0])
+    phone = Phone(args[1])
+    if name not in AddressBook:
+        AddressBook[name] = phone
     else:
         return f"A contact with the name '{name}' already exists. To change his number, use the command 'change {name} phone'."
     return f"Contact '{name}':'{phone}' added successfully."
@@ -60,26 +61,26 @@ def add(*args):
 
 @input_error
 def phone(*args):
-    name = args[0]
-    if name in phone_book:
-        return f"Contact '{name}' has the number '{phone_book[name]}'."
+    name = Name(args[0])
+    if name in AddressBook:
+        return f"Contact '{name}' has the number '{AddressBook[name]}'."
     else:
         return f"Contact '{name}' it not found."
 
 
 @input_error
 def change_phone(*args):
-    name = args[0]
-    phone = args[1]
-    if name in phone_book:
-        phone_book[name] = phone
+    name = Name(args[0])
+    phone = Phone(args[1])
+    if name in AddressBook:
+        AddressBook[name] = phone
     else:
         return f"Contact '{name}' not found. Please add the contact '{name}' first using the command 'add {name} phone'."
     return f"Contact '{name}':'{phone}' changed successfully."
 
 
 def show_all(*args):
-    lst = ["{:^10}: {:>10}".format(k, v) for k, v in phone_book.items()]
+    lst = ["{:^10}: {:>10}".format(k, v) for k, v in AddressBook.items()]
     return "{:^10}: {:^10}".format("Name", "Phone") + "\n" + "\n".join(lst)
 
 
