@@ -7,23 +7,46 @@ class Field:
 
 class Name(Field):
     def __init__(self, name: str) -> None:
-        self.name = name
+        self.value = name
 
 
 class Phone(Field):
-    def __init__(self, phone: list) -> None:
-        self.phone = phone
+    def __init__(self, phone) -> None:
+        self.value = phone
 
 
 class Record:
-    def __init__(self, name: Name, phone: Phone) -> None:
+    def __init__(self, name: Name, phone: list):
         self.name = name
         self.phone = phone
 
+    def add_phone(self, phone: Phone):
+        self.phone.append(phone)
+
+    def del_phone(self, phone: Phone):
+        for ph in self.phone:
+            if phone.value == ph.value:
+                self.phone.remove(ph)
+
+    def edit_phone(self, old_phone: Phone, new_phone: Phone):
+        self.del_phone(old_phone)
+        self.add_phone(new_phone)
+
+
+    def __repr__(self):
+        return f"{self.name.value}: {[ph.value for ph in self.phone]}"
+
 
 class AddressBook(UserDict):
-    def __init__(self, name: Name, phone: Phone):
-        self.items[name] = phone
+    def add_user(self, record: Record):
+        self.data[record.name.value] = record
+
+    def show_phone(self, name: Name):
+        return [n.value for n in self.data[name].phone]
+
+
+phone_book = AddressBook()
+
 
 
 def input_error(func):
@@ -51,45 +74,51 @@ def hello(*args):
 @input_error
 def add(*args):
     name = Name(args[0])
-    phone = Phone(args[1])
-    if name not in AddressBook:
-        AddressBook[name] = phone
+    phone = []
+    for ph in args[1:]:
+        phone.append(Phone(ph))
+    rec = Record(name, phone)
+    if rec.name.value not in phone_book:
+        phone_book.add_user(rec)
     else:
-        return f"A contact with the name '{name}' already exists. To change his number, use the command 'change {name} phone'."
-    return f"Contact '{name}':'{phone}' added successfully."
+        return f"A contact with the name '{args[0]}' already exists. To change his number, use the command 'change {args[0]} phone'."
+    return f"Contact '{args[0]}':'{args[1]}' added successfully."
 
 
 @input_error
-def phone(*args):
-    name = Name(args[0])
-    if name in AddressBook:
-        return f"Contact '{name}' has the number '{AddressBook[name]}'."
-    else:
-        return f"Contact '{name}' it not found."
+def show_phone(*args):
+    return phone_book.show_phone(args[0])
+
+@input_error
+def add_phone(*args):
+    phone_book[args[0]].add_phone(Phone(args[1]))
+    return f"For user {args[0]} add phone {args[1]}"
+
+@input_error
+def del_phone(*args):
+    phone_book[args[0]].del_phone(Phone(args[1]))
+    return f"For user {args[0]} del phone {args[1]}"
 
 
 @input_error
 def change_phone(*args):
-    name = Name(args[0])
-    phone = Phone(args[1])
-    if name in AddressBook:
-        AddressBook[name] = phone
-    else:
-        return f"Contact '{name}' not found. Please add the contact '{name}' first using the command 'add {name} phone'."
-    return f"Contact '{name}':'{phone}' changed successfully."
+    phone_book[args[0]].edit_phone(Phone(args[1]), Phone(args[2]))
+    return f"Contact '{args[0]}' changed paddhone '{args[2]}' successfully."
 
 
 def show_all(*args):
-    lst = ["{:^10}: {:>10}".format(k, v) for k, v in AddressBook.items()]
+    lst = ["{:^10}: {:>10}".format(k, str(v)) for k, v in phone_book.items()]
     return "{:^10}: {:^10}".format("Name", "Phone") + "\n" + "\n".join(lst)
 
 
 COMMANDS = {quit: ["good bye", "close", "exit"],
             hello: ["hello"],
+            add_phone: ["add phone"],
+            del_phone: ["del phone"],
             add: ["add"],
-            phone: ["phone"],
             change_phone: ["change"],
-            show_all: ["show all"]
+            show_all: ["show all"],
+            show_phone: ["phone"]
             }
 
 
