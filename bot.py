@@ -73,12 +73,12 @@ def hello(*args):
 
 @input_error
 def add(*args):
-    name = Name(args[0])
-    phone = []
-    for ph in args[1:]:
-        phone.append(Phone(ph))
-    rec = Record(name, phone)
-    if rec.name.value not in phone_book:
+    if args[0] not in phone_book:
+        name = Name(args[0])
+        phones = []
+        for ph in args[1:]:
+            phones.append(Phone(ph))
+        rec = Record(name, phones)
         phone_book.add_user(rec)
     else:
         return f"A contact with the name '{args[0]}' already exists. To change his number, use the command 'change {args[0]} phone'."
@@ -103,12 +103,12 @@ def del_phone(*args):
 @input_error
 def change_phone(*args):
     phone_book[args[0]].edit_phone(Phone(args[1]), Phone(args[2]))
-    return f"Contact '{args[0]}' changed paddhone '{args[2]}' successfully."
+    return f"Contact '{args[0]}' changed phone '{args[2]}' successfully."
 
 
 def show_all(*args):
     lst = ["{:^10}: {:>10}".format(k, str(v)) for k, v in phone_book.items()]
-    return "{:^10}: {:^10}".format("Name", "Phone") + "\n" + "\n".join(lst)
+    return "{:^10}: {:^10}".format("Name", "Phones") + "\n" + "\n".join(lst)
 
 
 COMMANDS = {quit: ["good bye", "close", "exit"],
