@@ -1,23 +1,25 @@
 from collections import UserDict
+from datetime import datetime
 
 
 class Field:
-    pass
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 
 class Name(Field):
     def __init__(self, name: str) -> None:
-        self.value = name
+        super().__init__(name)
 
 
 class Phone(Field):
     def __init__(self, phone) -> None:
-        self.value = phone
+        super().__init__(phone)
 
 
 class Birthday(Field):
     def __int__(self, birthday) -> None:
-        self.birthday = birthday
+        super().__int__(birthday)
 
 class Record:
     def __init__(self, name: Name, phone: list, birthday: Birthday = None):
@@ -37,6 +39,8 @@ class Record:
         self.del_phone(old_phone)
         self.add_phone(new_phone)
 
+    def days_to_birthday(self):
+        pass
 
     def __repr__(self):
         return f"{self.name.value}: {[ph.value for ph in self.phone]}"
@@ -48,6 +52,9 @@ class AddressBook(UserDict):
 
     def show_phone(self, name: Name):
         return [n.value for n in self.data[name].phone]
+
+    def iterator(self):
+        pass
 
 
 phone_book = AddressBook()
