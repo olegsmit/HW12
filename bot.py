@@ -15,10 +15,15 @@ class Phone(Field):
         self.value = phone
 
 
+class Birthday(Field):
+    def __int__(self, birthday) -> None:
+        self.birthday = birthday
+
 class Record:
-    def __init__(self, name: Name, phone: list):
+    def __init__(self, name: Name, phone: list, birthday: Birthday = None):
         self.name = name
         self.phone = phone
+        self.birthday = birthday
 
     def add_phone(self, phone: Phone):
         self.phone.append(phone)
