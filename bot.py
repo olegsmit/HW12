@@ -22,9 +22,9 @@ class Birthday(Field):
         super().__int__(birthday)
 
 class Record:
-    def __init__(self, name: Name, phone: list, birthday: Birthday = None):
+    def __init__(self, name: Name, phones: list[Phone], birthday: Birthday = None):
         self.name = name
-        self.phone = phone
+        self.phone = phones
         self.birthday = birthday
 
     def add_phone(self, phone: Phone):
