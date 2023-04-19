@@ -4,22 +4,49 @@ from datetime import datetime
 
 class Field:
     def __init__(self, value: str) -> None:
+        self.__value = None
         self.value = value
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        self.__value = value
 
 
 class Name(Field):
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
+
+
+    @Field.value.setter
+    def value(self, value):
+        if value.isalpha():
+            Field.value.fset(self, value)
+        else:
+            raise ValueError
 
 
 class Phone(Field):
-    def __init__(self, phone) -> None:
-        super().__init__(phone)
+    def __init__(self, value) -> None:
+        super().__init__(value)
+
+    @Field.value.setter
+    def value(self, value):
+        pass
 
 
 class Birthday(Field):
     def __int__(self, birthday) -> None:
         super().__int__(birthday)
+
+    @Field.value.setter
+    def value(self, value):
+        datetime.strptime(value, "%Y-%m-%d")
+        Field.value.fset(self, value)
+
 
 class Record:
     def __init__(self, name: Name, phones: list[Phone], birthday: Birthday = None):
