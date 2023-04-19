@@ -115,9 +115,10 @@ def add(*args):
     if args[0] not in phone_book:
         name = Name(args[0])
         phones = []
+        birthday = Birthday(args[-1])
         for ph in args[1:]:
             phones.append(Phone(ph))
-        rec = Record(name, phones)
+        rec = Record(name, phones, birthday)
         phone_book.add_user(rec)
     else:
         return f"A contact with the name '{args[0]}' already exists. To change his number, use the command 'change {args[0]} phone'."
