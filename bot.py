@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class Field:
-    def __init__(self, value: str) -> None:
+    def __init__(self, value):
         self.__value = None
         self.value = value
 
@@ -17,9 +17,8 @@ class Field:
 
 
 class Name(Field):
-    def __init__(self, value: str) -> None:
+    def __init__(self, value):
         super().__init__(value)
-
 
     @Field.value.setter
     def value(self, value):
@@ -30,26 +29,32 @@ class Name(Field):
 
 
 class Phone(Field):
-    def __init__(self, value) -> None:
+    def __init__(self, value):
         super().__init__(value)
 
     @Field.value.setter
     def value(self, value):
-        pass
+        if value.replace("+", "").replace("(", "").replace(")", "").replace("-", "").isdigit():
+            Field.value.fset(self, value)
+        else:
+            raise ValueError
 
 
 class Birthday(Field):
-    def __int__(self, birthday) -> None:
-        super().__int__(birthday)
+    def __int__(self, value):
+        super().__init__(value)
 
     @Field.value.setter
     def value(self, value):
-        datetime.strptime(value, "%Y-%m-%d")
-        Field.value.fset(self, value)
+        try:
+            datetime.strptime(value, "%Y/%m/%d")
+            Field.value.fset(self, value)
+        except:
+            Field.value.fset(self, "")
 
 
 class Record:
-    def __init__(self, name: Name, phones: list[Phone], birthday: Birthday = None):
+    def __init__(self, name: Name, phones: list[Phone] = None, birthday: Birthday = None):
         self.name = name
         self.phone = phones
         self.birthday = birthday
@@ -67,25 +72,53 @@ class Record:
         self.add_phone(new_phone)
 
     def days_to_birthday(self):
-        pass
+        if self.birthday:
+            current_date = datetime.now().date()
+            year_cur = current_date.year
+            number_day = datetime.strptime(self.birthday.value, "%Y/%m/%d").replace(
+                year=year_cur).date() - current_date
+            if number_day.days < 0:
+                number_day = datetime.strptime(self.birthday.value, "%Y/%m/%d").replace(
+                    year=year_cur + 1).date() - current_date
+            return f"{number_day.days} to {self.name.value}'s birthday"
+        else:
+            return "Can't calculate"
 
     def __repr__(self):
-        return f"{self.name.value}: {[ph.value for ph in self.phone]}"
+        return f"Name: {self.name.value}, Phone: {[ph.value for ph in self.phone]}, Birthday: {self.birthday.value}"
 
 
 class AddressBook(UserDict):
+    N = 2
+
     def add_user(self, record: Record):
         self.data[record.name.value] = record
 
     def show_phone(self, name: Name):
         return [n.value for n in self.data[name].phone]
 
+    def show_all_records(contacts, *args):
+        if not contacts:
+            return 'Address book is empty'
+        result = 'List of all users:\n'
+        print_list = contacts.iterator()
+        for item in print_list:
+            result += f'{item}'
+        return result
+
     def iterator(self):
-        pass
+        index, print_block = 1, '-' * 50 + '\n'
+        for record in self.data.values():
+            print_block += str(record) + '\n'
+            if index < self.N:
+                index += 1
+            else:
+                yield print_block
+                index, print_block = 1, '-' * 50 + '\n'
+        yield print_block
 
 
 phone_book = AddressBook()
-
 
 
 def input_error(func):
@@ -110,29 +143,41 @@ def hello(*args):
     return "How can I help you?"
 
 
-@input_error
-def add(*args):
-    if args[0] not in phone_book:
-        name = Name(args[0])
-        phones = []
-        birthday = Birthday(args[-1])
-        for ph in args[1:]:
-            phones.append(Phone(ph))
-        rec = Record(name, phones, birthday)
+# @input_error
+def add(*arg):
+    try:
+        name = Name(arg[0])
+    except ValueError:
+        return "Please enter a name"
+    phone_list = []
+    for ph in arg:
+        try:
+            phone_list.append(Phone(ph))
+        except ValueError:
+            continue
+    try:
+        birthday = Birthday(arg[-1])
+    except ValueError:
+        birthday = Birthday(None)
+
+    rec = Record(name, phone_list, birthday)
+    if rec.name.value not in phone_book:
         phone_book.add_user(rec)
     else:
-        return f"A contact with the name '{args[0]}' already exists. To change his number, use the command 'change {args[0]} phone'."
-    return f"Contact '{args[0]}':'{args[1]}' added successfully."
+        return f"A contact with the name '{name.value}' already exists. To change his number, use the command 'change {name.value} phone'."
+    return f"Contact '{name.value}' added successfully."
 
 
 @input_error
 def show_phone(*args):
     return phone_book.show_phone(args[0])
 
+
 @input_error
 def add_phone(*args):
     phone_book[args[0]].add_phone(Phone(args[1]))
     return f"For user {args[0]} add phone {args[1]}"
+
 
 @input_error
 def del_phone(*args):
@@ -147,8 +192,12 @@ def change_phone(*args):
 
 
 def show_all(*args):
-    lst = ["{:^10}: {:>10}".format(k, str(v)) for k, v in phone_book.items()]
-    return "{:^10}: {:^10}".format("Name", "Phones") + "\n" + "\n".join(lst)
+    return phone_book.show_all_records(args[0])
+
+
+@input_error
+def d_to_b(*args):
+    return phone_book[args[0]].days_to_birthday()
 
 
 COMMANDS = {quit: ["good bye", "close", "exit"],
@@ -158,7 +207,8 @@ COMMANDS = {quit: ["good bye", "close", "exit"],
             add: ["add"],
             change_phone: ["change"],
             show_all: ["show all"],
-            show_phone: ["phone"]
+            show_phone: ["phone"],
+            d_to_b: ["birthday"]
             }
 
 
