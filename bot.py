@@ -129,7 +129,7 @@ class AddressBook(UserDict):
 
 
 
-phone_book = AddressBook()
+phone_book = AddressBook(filename='phone_book.dat')
 
 
 def input_error(func):
@@ -147,6 +147,7 @@ def input_error(func):
 
 
 def quit(*args):
+    phone_book.save()
     return "Good bye!"
 
 
