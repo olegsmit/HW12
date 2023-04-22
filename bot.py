@@ -93,9 +93,12 @@ class Record:
 class AddressBook(UserDict):
     N = 2
     
-    def __int__(self, filename):
-        super().__int__()
+    def __init__(self, filename):
+        super().__init__()
         self.filename = Path(filename)
+        if self.filename.exists():
+            with open(self.filename, "rb") as db:
+                self.data = pickle.load(db)
 
     def add_user(self, record: Record):
         self.data[record.name.value] = record
@@ -125,11 +128,12 @@ class AddressBook(UserDict):
         
     def save(self):
         with open(self.filename, "wb") as db:
-            self.data = pickle.load(db)
+            pickle.dump(self.data, db)
 
 
 
-phone_book = AddressBook(filename='phone_book.dat')
+phone_book = AddressBook(filename='phone_book.bin')
+# phone_book = AddressBook()
 
 
 def input_error(func):
