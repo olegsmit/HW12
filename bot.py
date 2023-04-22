@@ -159,7 +159,7 @@ def hello(*args):
     return "How can I help you?"
 
 
-# @input_error
+@input_error
 def add(*arg):
     try:
         name = Name(arg[0])
@@ -216,6 +216,17 @@ def d_to_b(*args):
     return phone_book[args[0]].days_to_birthday()
 
 
+def search(*args):
+    result = []
+    for k, v in phone_book.items():
+        if args[0] in k or args[0] in [ph.value for ph in v.phone] or args[0] in v.birthday.value:
+            result.append("{:^10}: {:>10}".format(k, str(v)))
+    if result:
+        return "\n".join(result)
+    else:
+        return "No matches"
+
+
 COMMANDS = {quit: ["good bye", "close", "exit"],
             hello: ["hello"],
             add_phone: ["add phone"],
@@ -224,7 +235,8 @@ COMMANDS = {quit: ["good bye", "close", "exit"],
             change_phone: ["change"],
             show_all: ["show all"],
             show_phone: ["phone"],
-            d_to_b: ["birthday"]
+            d_to_b: ["birthday"],
+            search: ["search"]
             }
 
 
